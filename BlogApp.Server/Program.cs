@@ -36,6 +36,7 @@ namespace BlogApp.Server
             builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(
                 "Server=(localdb)\\MSSQLLocalDB;Database=BlogAppDB;Trusted_Connection=True;"));
             builder.Services.AddTransient<UsersService>();
+            builder.Services.AddTransient<NewsService>();
 
             var app = builder.Build();
 
