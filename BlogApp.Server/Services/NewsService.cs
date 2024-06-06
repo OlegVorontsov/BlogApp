@@ -6,9 +6,11 @@ namespace BlogApp.Server.Services
     public class NewsService
     {
         private readonly DataContext _dataContext;
-        public NewsService(DataContext dataContext)
+        private readonly NoSQLDataService _noSQLDataService;
+        public NewsService(DataContext dataContext, NoSQLDataService noSQLDataService)
         {
             _dataContext = dataContext;
+            _noSQLDataService = noSQLDataService;
         }
         public List<NewsModel> GetByAuthor(int userId)
         {
@@ -62,8 +64,7 @@ namespace BlogApp.Server.Services
         }
         public List<NewsModel> GetNewsForCurrentUser(int userId)
         {
-            var subs = _dataContext.UserSubs
-                                   .Where(x => x.From == userId).ToList();
+            var subs = _noSQLDataService.GetUserSub(userId);
             var allNews = new List<NewsModel>();
             foreach (var sub in subs)
             {
@@ -76,17 +77,13 @@ namespace BlogApp.Server.Services
         }
         public void SetLike(int newsId, int userId)
         {
-            var like = new NewsLike
-            {
-                From = userId,
-                NewsId = newsId
-            };
-            _dataContext.NewsLikes.Add(like);
-            _dataContext.SaveChangesAsync();
+            _noSQLDataService.SetNewsLike(
+                from: userId,
+                newsId: newsId);
         }
         private NewsModel ToModel(News news)
         {
-            var likes = _dataContext.NewsLikes.Where(x => x.NewsId == news.Id).Count();
+            var likes = _noSQLDataService.GetNewsLike(news.Id);
             var newsModel = new NewsModel
                 (
                     id: news.Id,
@@ -94,7 +91,7 @@ namespace BlogApp.Server.Services
                     img: news.Img,
                     postDate: news.PostDate
                 );
-            newsModel.LikesCount = likes;
+            newsModel.LikesCount = likes.UserIds.Count;
             return newsModel;
         }
     }

@@ -8,9 +8,11 @@ namespace BlogApp.Server.Services
     public class UsersService
     {
         private readonly DataContext _dataContext;
-        public UsersService(DataContext dataContext)
+        private readonly NoSQLDataService _noSQLDataService;
+        public UsersService(DataContext dataContext, NoSQLDataService noSQLDataService)
         {
             _dataContext = dataContext;
+            _noSQLDataService = noSQLDataService;
         }
         public UserModel Create (UserModel userModel)
         {
@@ -88,14 +90,7 @@ namespace BlogApp.Server.Services
         }
         public void Subscribe(int from, int to)
         {
-            var sub = new UserSub
-            {
-                From = from,
-                To = to,
-                Date = DateTime.Now
-            };
-            _dataContext.UserSubs.Add(sub);
-            _dataContext.SaveChangesAsync();
+            _noSQLDataService.SetUserSub(from, to);
         }
         private bool VerifyHashedPassword(string password1, string password2)
         {

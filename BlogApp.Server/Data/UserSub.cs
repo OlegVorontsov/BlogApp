@@ -2,8 +2,7 @@
 {
     public class UserSub
     {
-        public int From { get; set; }
-        public int To { get; set; }
-        public DateTime Date { get; set; }
+        public int UserId { get; set; }
+        public List<int> UserIds { get; set; }
     }
 }
