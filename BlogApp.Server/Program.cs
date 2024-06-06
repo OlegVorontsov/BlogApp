@@ -37,6 +37,7 @@ namespace BlogApp.Server
                 "Server=(localdb)\\MSSQLLocalDB;Database=BlogAppDB;Trusted_Connection=True;"));
             builder.Services.AddTransient<UsersService>();
             builder.Services.AddTransient<NewsService>();
+            builder.Services.AddTransient<NoSQLDataService>();
 
             var app = builder.Build();
 

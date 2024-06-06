@@ -1,5 +1,6 @@
 ﻿using BlogApp.Server.Data;
 using BlogApp.Server.Models;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace BlogApp.Server.Services
 {
@@ -15,6 +16,7 @@ namespace BlogApp.Server.Services
         public List<NewsModel> GetByAuthor(int userId)
         {
             var news = _dataContext.News.Where(n => n.AuthorId == userId)
+                                        .OrderBy(x => x.PostDate)
                                         .Reverse()
                                         .Select(ToModel)
                                         .ToList();
@@ -27,12 +29,13 @@ namespace BlogApp.Server.Services
                 AuthorId = userId,
                 Text = newsModel.Text,
                 Img = newsModel.Img,
-                PostDate = DateTime.UtcNow
+                PostDate = DateTime.Now
             };
             _dataContext.News.Add(newNews);
             _dataContext.SaveChanges();
 
             newsModel.Id = newNews.Id;
+            newsModel.PostDate = newNews.PostDate;
             return newsModel;
         }
         public NewsModel Update(NewsModel newsModel, int userId)
@@ -48,6 +51,8 @@ namespace BlogApp.Server.Services
 
             _dataContext.News.Update(newsToUpdate);
             _dataContext.SaveChanges();
+
+            newsModel = ToModel(newsToUpdate);
 
             return newsModel;
         }
@@ -66,10 +71,11 @@ namespace BlogApp.Server.Services
         {
             var subs = _noSQLDataService.GetUserSub(userId);
             var allNews = new List<NewsModel>();
-            foreach (var sub in subs)
+            if (subs is null) return allNews;
+            foreach (var sub in subs.UserIds)
             {
                 var allNewsByAuthor = _dataContext.News
-                                                  .Where(n => n.AuthorId == sub.To).ToList();
+                                                  .Where(n => n.AuthorId == sub).ToList();
                 allNews.AddRange(allNewsByAuthor.Select(ToModel));
             }
             allNews.Sort(new NewsComparer());
@@ -85,13 +91,13 @@ namespace BlogApp.Server.Services
         {
             var likes = _noSQLDataService.GetNewsLike(news.Id);
             var newsModel = new NewsModel
-                (
-                    id: news.Id,
-                    text: news.Text,
-                    img: news.Img,
-                    postDate: news.PostDate
-                );
-            newsModel.LikesCount = likes.UserIds.Count;
+            {
+                Id = news.Id,
+                Text = news.Text,
+                Img = news.Img,
+                PostDate = news.PostDate,
+                LikesCount = likes?.UserIds.Count ?? 0
+            };
             return newsModel;
         }
     }

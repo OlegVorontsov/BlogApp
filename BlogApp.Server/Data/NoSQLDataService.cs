@@ -1,10 +1,12 @@
 ﻿using LiteDB;
+using System.Reflection;
 
 namespace BlogApp.Server.Data
 {
     public class NoSQLDataService
     {
-        private readonly string DBPath = "";
+        private readonly string DBPath = "BlogApp_NoSQLDB.db";
+
         private const string SubsCollection = "SubsCollection";
         private const string NewsLikesCollection = "NewsLikesCollection";
 
