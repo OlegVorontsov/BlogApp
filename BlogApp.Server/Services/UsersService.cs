@@ -86,7 +86,17 @@ namespace BlogApp.Server.Services
             _dataContext.Users.Remove(user);
             _dataContext.SaveChangesAsync();
         }
-
+        public void Subscribe(int from, int to)
+        {
+            var sub = new UserSub
+            {
+                From = from,
+                To = to,
+                Date = DateTime.Now
+            };
+            _dataContext.UserSubs.Add(sub);
+            _dataContext.SaveChangesAsync();
+        }
         private bool VerifyHashedPassword(string password1, string password2)
         {
             return password1 == password2;
