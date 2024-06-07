@@ -75,7 +75,7 @@ namespace BlogApp.Server.Data
                 {
                     var newLikeForNews = new NewsLike
                     {
-                        NewsId = from,
+                        NewsId = newsId,
                         UserIds = new List<int> { from }
                     };
                     likes.Insert(newLikeForNews);

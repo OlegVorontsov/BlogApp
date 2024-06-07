@@ -67,7 +67,7 @@ namespace BlogApp.Server.Controllers
             _newsService.Delete(newsId, currentUser.Id);
             return Ok();
         }
-        [HttpPost("{newsId}")]
+        [HttpPost("Like/{newsId}")]
         public IActionResult SetLike(int newsId)
         {
             var currentUser = _userService.GetUserByLogin(HttpContext.User.Identity.Name);

@@ -83,13 +83,19 @@ namespace BlogApp.Server.Services
         {
             return _dataContext.Users.FirstOrDefault(u => u.Email == email);
         }
-        public List<UserModel> GetUsersByName(string name)
+        public UserProfileModel? GetUserProfileModelById(int userId)
+        {
+            var user = _dataContext.Users.FirstOrDefault(u => u.Id == userId);
+            if (user is null) return null;
+            return ToProfileModel(user);
+        }
+        public List<UserShortModel> GetUsersByName(string name)
         {
             string nameLower = name.ToLower();
             return _dataContext.Users
                                .Where(u => u.Name.ToLower()
                                .StartsWith(nameLower))
-                               .Select(ToModel)
+                               .Select(ToShortModel)
                                .ToList();
         }
         public void DeleteUser(User user)
@@ -113,6 +119,29 @@ namespace BlogApp.Server.Services
                 Name = user.Name,
                 Email = user.Email,
                 Description = user.Description,
+                Photo = user.Photo
+            };
+        }
+        private UserProfileModel ToProfileModel(User user)
+        {
+            var userSubs = _noSQLDataService.GetUserSub(user.Id);
+            return new UserProfileModel
+            {
+                Id = user.Id,
+                Name = user.Name,
+                Email = user.Email,
+                Description = user.Description,
+                SubsCount = userSubs?.UserIds.Count() ?? 0,
+                Photo = user.Photo
+            };
+        }
+        private UserShortModel ToShortModel(User user)
+        {
+            return new UserShortModel
+            {
+                Id = user.Id,
+                Name = user.Name,
+                Description = new string(user.Description?.Take(50).ToArray()),
                 Photo = user.Photo
             };
         }
