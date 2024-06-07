@@ -147,7 +147,7 @@ namespace BlogApp.Server.Services
                 Name = user.Name,
                 Email = user.Email,
                 Description = user.Description,
-                SubsCount = userSubs?.UserIds.Count() ?? 0,
+                SubsCount = userSubs?.UserSubsList.Count() ?? 0,
                 Photo = user.Photo
             };
         }

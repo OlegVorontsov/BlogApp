@@ -38,6 +38,22 @@ namespace BlogApp.Server.Services
             newsModel.PostDate = newNews.PostDate;
             return newsModel;
         }
+        public List<NewsModel> CreateNews(List<NewsModel> newsModels, int userId)
+        {
+            foreach (var newsModel in newsModels)
+            {
+                var newNews = new News
+                {
+                    AuthorId = userId,
+                    Text = newsModel.Text,
+                    Img = newsModel.Img,
+                    PostDate = DateTime.Now
+                };
+                _dataContext.News.Add(newNews);
+            }
+            _dataContext.SaveChanges();
+            return newsModels;
+        }
         public NewsModel Update(NewsModel newsModel, int userId)
         {
             var newsToUpdate = _dataContext.News
@@ -72,10 +88,10 @@ namespace BlogApp.Server.Services
             var subs = _noSQLDataService.GetUserSub(userId);
             var allNews = new List<NewsModel>();
             if (subs is null) return allNews;
-            foreach (var sub in subs.UserIds)
+            foreach (var sub in subs.UserSubsList)
             {
                 var allNewsByAuthor = _dataContext.News
-                                                  .Where(n => n.AuthorId == sub).ToList();
+                                                  .Where(n => n.AuthorId == sub.Id).ToList();
                 allNews.AddRange(allNewsByAuthor.Select(ToModel));
             }
             allNews.Sort(new NewsComparer());
