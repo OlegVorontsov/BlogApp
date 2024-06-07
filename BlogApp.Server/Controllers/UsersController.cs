@@ -1,4 +1,6 @@
-﻿using BlogApp.Server.Services;
+﻿using BlogApp.Server.Data;
+using BlogApp.Server.Models;
+using BlogApp.Server.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -35,6 +37,18 @@ namespace BlogApp.Server.Controllers
         public IActionResult Get(int userId)
         {
             return Ok(_userService.GetUserProfileModelById(userId));
+        }
+        [HttpPost("create")]
+        public IActionResult CreateUsers([FromBody] List<UserModel> users)
+        {
+            var currentUser = _userService.GetUserByLogin(HttpContext.User.Identity.Name);
+            if (currentUser == null)
+            {
+                return NotFound();
+            }
+            if (currentUser.Id != 1) return BadRequest();
+            var listEserModels = _userService.CreateUsers(users);
+            return Ok(listEserModels);
         }
     }
 }

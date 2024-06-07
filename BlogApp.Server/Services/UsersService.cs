@@ -26,8 +26,24 @@ namespace BlogApp.Server.Services
             };
             _dataContext.Users.Add(newUser);
             _dataContext.SaveChangesAsync();
-            userModel.Id = newUser.Id;
             return userModel;
+        }
+        public List<UserModel> CreateUsers(List<UserModel> users)
+        {
+            foreach (var userModel in users)
+            {
+                var newUser = new User
+                {
+                    Name = userModel.Name,
+                    Email = userModel.Email,
+                    Password = userModel.Password,
+                    Description = userModel.Description,
+                    Photo = userModel.Photo
+                };
+                _dataContext.Users.Add(newUser);
+            }
+            _dataContext.SaveChangesAsync();
+            return users;
         }
         public UserModel Update(User userToUpdate, UserModel userModel)
         {
